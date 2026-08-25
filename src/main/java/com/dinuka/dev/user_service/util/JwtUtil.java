@@ -19,7 +19,7 @@ public class JwtUtil {
         this.key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
     }
 
-    public String generateToken(Long userId, String email, String role) {
+    public String generateToken(Long userId, String email, String role, String name) {
         Date now = new Date();
         Date expiry = new Date(now.getTime() + expirationMs);
 
@@ -27,6 +27,7 @@ public class JwtUtil {
                 .subject(String.valueOf(userId))
                 .claim("email", email)
                 .claim("role", role)
+                .claim("name", name)
                 .issuedAt(now)
                 .expiration(expiry)
                 .signWith(key)

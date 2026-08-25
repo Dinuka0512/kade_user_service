@@ -8,7 +8,7 @@ spring:
     date-format: "yyyy-MM-dd'T'HH:mm:ss.SSSXXX"
     time-zone: "UTC"
   datasource:
-    url: "jdbc:mysql://localhost:3306/kade_users?allowPublicKeyRetrieval=true&useSSL=false"
+    url: "jdbc:mysql://localhost:3307/kade_users?allowPublicKeyRetrieval=true&useSSL=false"
     username: root
     password: "0512"
     driver-class-name: com.mysql.cj.jdbc.Driver
