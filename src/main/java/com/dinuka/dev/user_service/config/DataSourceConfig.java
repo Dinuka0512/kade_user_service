@@ -28,25 +28,65 @@ public class DataSourceConfig {
 
     @Bean
     public DataSource dataSource() throws SQLException {
+
+        // Create database if it doesn't exist
         createDatabaseIfNotExists();
 
-        HikariDataSource ds = new HikariDataSource();
-        ds.setJdbcUrl(url);
-        ds.setUsername(username);
-        ds.setPassword(password);
-        ds.setDriverClassName(driverClassName);
-        return ds;
+        // Connect to the actual database
+        HikariDataSource dataSource = new HikariDataSource();
+
+        dataSource.setJdbcUrl(url);
+        dataSource.setUsername(username);
+        dataSource.setPassword(password);
+        dataSource.setDriverClassName(driverClassName);
+
+        return dataSource;
     }
 
     private void createDatabaseIfNotExists() throws SQLException {
-        String dbName = url.substring(url.lastIndexOf('/') + 1);
-        if (dbName.contains("?")) dbName = dbName.substring(0, dbName.indexOf('?'));
-        String serverUrl = url.substring(0, url.lastIndexOf('/') + 1) + "?allowPublicKeyRetrieval=true&useSSL=false";
 
-        try (Connection conn = DriverManager.getConnection(serverUrl, username, password);
-             Statement stmt = conn.createStatement()) {
-            stmt.executeUpdate("CREATE DATABASE IF NOT EXISTS `" + dbName + "`");
-            System.out.println("Database '" + dbName + "' is ready.");
+        // Extract database name from JDBC URL
+        String databaseName = url.substring(
+                url.lastIndexOf('/') + 1
+        );
+
+        // Remove query parameters
+        if (databaseName.contains("?")) {
+            databaseName = databaseName.substring(
+                    0,
+                    databaseName.indexOf('?')
+            );
+        }
+
+        // Remove database name from URL
+        String serverUrl = url.substring(
+                0,
+                url.lastIndexOf('/') + 1
+        );
+
+        // Connect to MySQL server without selecting a database
+        String connectionUrl =
+                serverUrl +
+                        "?allowPublicKeyRetrieval=true&useSSL=false";
+
+        try (
+                Connection connection = DriverManager.getConnection(
+                        connectionUrl,
+                        username,
+                        password
+                );
+                Statement statement = connection.createStatement()
+        ) {
+
+            statement.executeUpdate(
+                    "CREATE DATABASE IF NOT EXISTS `" +
+                            databaseName +
+                            "`"
+            );
+
+            System.out.println(
+                    "Database '" + databaseName + "' is ready."
+            );
         }
     }
 }
